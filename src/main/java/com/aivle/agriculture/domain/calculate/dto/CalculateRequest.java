@@ -3,11 +3,15 @@ package com.aivle.agriculture.domain.calculate.dto;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
+@Getter
 public class CalculateRequest {
 
     private final InsuredItem insuredItem;
@@ -23,7 +27,7 @@ public class CalculateRequest {
     ) {
         this.insuredItem = insuredItem;
         this.coverageType = coverageType;
-        this.cropType     = cropType;
+        this.cropType = cropType;
     }
 
     @JsonAnySetter
@@ -34,9 +38,4 @@ public class CalculateRequest {
 
         params.put(key, new BigDecimal(value.toString()));
     }
-
-    public InsuredItem insuredItem() { return insuredItem; }
-    public CoverageType coverageType() { return coverageType; }
-    public CropType cropType()     { return cropType; }
-    public Map<String, BigDecimal> params() { return params; }
 }
