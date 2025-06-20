@@ -2,7 +2,6 @@ package com.aivle.agriculture.domain.calculate.dto;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,9 +20,9 @@ public class CalculateRequest {
 
     @JsonCreator
     public CalculateRequest(
-            @JsonProperty("insuredItem") InsuredItem insuredItem,
-            @JsonProperty("cropType") CropType cropType,
-            @JsonProperty("coverageType") CoverageType coverageType
+            InsuredItem insuredItem,
+            CropType cropType,
+            CoverageType coverageType
     ) {
         this.insuredItem = insuredItem;
         this.coverageType = coverageType;
