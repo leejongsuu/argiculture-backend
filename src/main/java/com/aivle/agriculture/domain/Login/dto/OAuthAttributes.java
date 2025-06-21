@@ -19,17 +19,20 @@ public class OAuthAttributes {
         this.email = email;
     }
 
-    public static com.aivle.agriculture.domain.Login.dto.OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
+    public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         if ("naver".equals(registrationId)) {
-            return ofNaver(userNameAttributeName, (Map<String, Object>) attributes.get("response"));
+            return ofNaver(userNameAttributeName, attributes); // 여기만 수정!
         } else if ("kakao".equals(registrationId)) {
             return ofKakao(userNameAttributeName, attributes);
+        } else if ("google".equals(registrationId)) {
+            return ofGoogle(userNameAttributeName, attributes);
         }
-        return ofGoogle(userNameAttributeName, attributes);  // 기본은 구글
+        throw new IllegalArgumentException("지원하지 않는 소셜 로그인입니다: " + registrationId);
     }
 
-    private static com.aivle.agriculture.domain.Login.dto.OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
-        return new com.aivle.agriculture.domain.Login.dto.OAuthAttributes(
+
+    private static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
+        return new OAuthAttributes(
                 attributes,
                 userNameAttributeName,
                 (String) attributes.get("name"),
@@ -37,20 +40,24 @@ public class OAuthAttributes {
         );
     }
 
-    private static com.aivle.agriculture.domain.Login.dto.OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
-        return new com.aivle.agriculture.domain.Login.dto.OAuthAttributes(
+    private static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+        if (attributes == null) {
+            throw new IllegalArgumentException("Naver attributes가 null입니다.");
+        }
+
+        return new OAuthAttributes(
                 attributes,
                 userNameAttributeName,
-                (String) attributes.get("name"),
+                (String) attributes.get("name"),  // 또는 nickname
                 (String) attributes.get("email")
         );
     }
 
-    private static com.aivle.agriculture.domain.Login.dto.OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
+    private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
-        return new com.aivle.agriculture.domain.Login.dto.OAuthAttributes(
+        return new OAuthAttributes(
                 attributes,
                 userNameAttributeName,
                 (String) profile.get("nickname"),
