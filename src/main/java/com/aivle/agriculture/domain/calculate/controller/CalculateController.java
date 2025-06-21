@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/calc")
@@ -20,8 +19,7 @@ public class CalculateController {
     private final CalculateService calculateService;
 
     @PostMapping
-    public Mono<Response<CalculateResponse>> calculate(@RequestBody CalculateRequest request) {
-        return calculateService.calculate(request)
-                .map(calculateResponse -> Response.of(SuccessCode.OK, calculateResponse));
+    public Response<CalculateResponse> calculate(@RequestBody CalculateRequest request) {
+        return Response.of(SuccessCode.OK, calculateService.calculate(request));
     }
 }
