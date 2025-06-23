@@ -79,21 +79,21 @@ public class LossCalculator implements Calculator {
     private BigDecimal calculateDureupDamageRate(Map<String, BigDecimal> params) {
         BigDecimal damagedFruitletCount = MapUtils.getRequired(params, "damagedFruitletCount"); // 피해 정아지 수
         BigDecimal totalFruitletCount = MapUtils.getRequired(params, "totalFruitletCount"); // 총 정아지 수
-        BigDecimal uncompensatedReductionFruitCount = MapUtils.getRequired(params, "uncompensatedReductionFruitCount"); // 미보상비율
+        BigDecimal uncompensatedRate = MapUtils.getRequired(params, "uncompensatedRate"); // 미보상비율
 
         return (damagedFruitletCount.divide(totalFruitletCount, 2, RoundingMode.HALF_UP))
-                .multiply(BigDecimal.ONE.subtract(uncompensatedReductionFruitCount));
+                .multiply(BigDecimal.ONE.subtract(uncompensatedRate));
     }
 
     // 최종 꽃 피해율 + {(1-최종 꽃 피해율) × 과실손해피해율 × (1-미보상비율)}
     private BigDecimal calculateBlueberryDamageRate(Map<String, BigDecimal> params) {
         BigDecimal finalFlowerDamageRate = MapUtils.getRequired(params, "finalFlowerDamageRate"); // 최종 꽃 피해율
         BigDecimal fruitDamageRate = MapUtils.getRequired(params, "fruitDamageRate"); // 과실 손해 피해율
-        BigDecimal uncompensatedReductionFruitCount = MapUtils.getRequired(params, "uncompensatedReductionFruitCount"); // 미보상비율
+        BigDecimal uncompensatedRate = MapUtils.getRequired(params, "uncompensatedRate"); // 미보상비율
 
-        return finalFlowerDamageRate.add((BigDecimal.ONE.subtract(uncompensatedReductionFruitCount))
+        return finalFlowerDamageRate.add((BigDecimal.ONE.subtract(uncompensatedRate))
                 .multiply(fruitDamageRate)
-                .multiply(BigDecimal.ONE.subtract(uncompensatedReductionFruitCount)));
+                .multiply(BigDecimal.ONE.subtract(uncompensatedRate)));
     }
 
     // 고사결과모지수 ÷ 평년결과모지수
