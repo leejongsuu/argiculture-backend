@@ -27,13 +27,13 @@ public class FacilityProductionCostCalculator implements Calculator {
             CropType.LETTUCE,        // 상추
             CropType.EGGPLANT,       // 가지
             CropType.CABBAGE,        // 배추
-            CropType.GREEN_ONION,    // 파(대파)
+            CropType.GREEN_ONION,    // 대파
             CropType.LILY,           // 백합
             CropType.CARNATION,      // 카네이션
             CropType.WATER_PARSLEY,  // 미나리
             CropType.POTATO,         // 감자
             CropType.SPINACH,        // 시금치
-            CropType.SCALLION,       // 파(쪽파)
+            CropType.SCALLION,       // 쪽파
             CropType.RADISH,         // 무
             CropType.CROWN_DAISY,    // 쑥갓
             CropType.OYSTER_MUSHROOM,        // 느타리버섯

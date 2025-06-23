@@ -48,12 +48,13 @@ public enum CropType {
     MELON,                // 멜론
     EGGPLANT,             // 가지
     GREEN_ONION,          // 대파
-    SCALLION,             // 쪽파(실파)
+    SCALLION,             // 쪽파
     LILY,                 // 백합
     CARNATION,            // 카네이션
     WATER_PARSLEY,        // 미나리
     CROWN_DAISY,          // 쑥갓
     LOG_SHIITAKE,         // 원목재배 표고버섯
+    SHIITAKE,             // 표고버섯
     OYSTER_MUSHROOM,      // 느타리버섯
     KING_OYSTER_MUSHROOM, // 새송이버섯
     BUTTON_MUSHROOM,      // 양송이버섯

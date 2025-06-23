@@ -22,7 +22,8 @@ public class ProductionCostCalculator implements Calculator {
             CropType.CARROT,         // 당근
             CropType.CABBAGE,        // 배추
             CropType.RADISH,         // 무
-            CropType.GREEN_ONION,    // 파
+            CropType.GREEN_ONION,    // 대파
+            CropType.SCALLION,       // 쪽파
             CropType.SPINACH,        // 시금치
             CropType.ICEBERG_LETTUCE         // 양상추
     );
