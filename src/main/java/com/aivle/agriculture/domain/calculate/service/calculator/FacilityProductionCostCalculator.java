@@ -13,34 +13,6 @@ import java.util.Set;
 @Component
 public class FacilityProductionCostCalculator implements Calculator {
 
-    private static final Set<CropType> GROUP_A = Set.of(
-            CropType.STRAWBERRY,     // 딸기
-            CropType.TOMATO,         // 토마토
-            CropType.CUCUMBER,       // 오이
-            CropType.KOREAN_MELON,   // 참외
-            CropType.PUMPKIN,        // 호박
-            CropType.PEPPER,         // 고추
-            CropType.PAPRIKA,        // 파프리카
-            CropType.CHRYSANTHEMUM,  // 국화
-            CropType.WATERMELON,     // 수박
-            CropType.MELON,          // 멜론
-            CropType.LETTUCE,        // 상추
-            CropType.EGGPLANT,       // 가지
-            CropType.CABBAGE,        // 배추
-            CropType.GREEN_ONION,    // 대파
-            CropType.LILY,           // 백합
-            CropType.CARNATION,      // 카네이션
-            CropType.WATER_PARSLEY,  // 미나리
-            CropType.POTATO,         // 감자
-            CropType.SPINACH,        // 시금치
-            CropType.SCALLION,       // 쪽파
-            CropType.RADISH,         // 무
-            CropType.CROWN_DAISY,    // 쑥갓
-            CropType.OYSTER_MUSHROOM,        // 느타리버섯
-            CropType.KING_OYSTER_MUSHROOM,   // 새송이버섯
-            CropType.BUTTON_MUSHROOM         // 양송이버섯
-    );
-
     private static final Set<CropType> GROUP_B = Set.of(
             CropType.LOG_SHIITAKE,   // 원목재배 표고버섯
             CropType.CHIVE           // 부추
@@ -63,7 +35,7 @@ public class FacilityProductionCostCalculator implements Calculator {
                 .multiply(BigDecimal.ONE.subtract(uncompensatedRate));
 
         // 피해작물 재배면적 * 피해작물 단위면적당 보장생산비 * 경과비율 * 피해비율 * 손해정도비율 * (1 - 미보상비율)
-        if (!GROUP_A.contains(cropType)) {
+        if (!GROUP_B.contains(cropType)) {
             BigDecimal elapsedRate = MapUtils.getRequired(params, "elapsedRate"); // 경과비율
 
             insurance = insurance.multiply(elapsedRate);
