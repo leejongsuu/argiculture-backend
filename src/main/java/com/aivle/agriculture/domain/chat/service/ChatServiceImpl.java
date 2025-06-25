@@ -1,31 +1,75 @@
 package com.aivle.agriculture.domain.chat.service;
 
-import com.aivle.agriculture.domain.chat.dto.ChatRequest;
+import com.aivle.agriculture.domain.Login.entity.User;
+import com.aivle.agriculture.domain.Login.repository.UserRepository;
 import com.aivle.agriculture.domain.chat.dto.ChatResponse;
-import com.aivle.agriculture.domain.common.client.FastApiClient;
+import com.aivle.agriculture.domain.chat.dto.RagPayload;
+import com.aivle.agriculture.domain.chat.entity.ChatMessage;
+import com.aivle.agriculture.domain.chat.entity.Role;
+import com.aivle.agriculture.domain.chat.repository.ChatMessageRepository;
 import com.aivle.agriculture.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 
-import static com.aivle.agriculture.global.response.ErrorCode.INTERNAL_SERVER_ERROR;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.aivle.agriculture.global.response.ErrorCode.NOT_FOUND;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
 
+    private final ChatMessageRepository chatMessageRepository;
+    private final UserRepository userRepository;
     private final FastApiClient fastApiClient;
 
     @Override
-    public Mono<ChatResponse> ask(ChatRequest request) {
-        return fastApiClient.askRag(request.question())
-                .onErrorMap(error -> {
-//                    if (error instanceof SomeSpecificException) {
-//                        return new CustomException(ErrorCode.INVALID_INPUT);
-//                    }
-                    return new CustomException(INTERNAL_SERVER_ERROR, error);
-                });
+    public ChatResponse ask(String convId, String question) {
+
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CustomException(NOT_FOUND, "유저를 찾을 수 없습니다."));
+
+        ChatMessage userMessage = ChatMessage.builder()
+                .conversationId(convId)
+                .role(Role.USER)
+                .content(question)
+                .user(user)
+                .build();
+
+        chatMessageRepository.save(userMessage);
+
+        List<ChatMessage> history = chatMessageRepository.findRecentMessages(convId, PageRequest.of(0, 7));
+
+        Collections.reverse(history);
+
+        String context = history.stream()
+                .map(msg -> msg.getRole() + ": " + msg.getContent())
+                .collect(Collectors.joining("\n"));
+
+        RagPayload payload = RagPayload.builder()
+                .conversationId(convId)
+                .context(context)
+                .question(question)
+                .build();
+
+        ChatResponse chatResponse = fastApiClient.askRag(payload);
+
+        ChatMessage botMsg = ChatMessage.builder()
+                .conversationId(convId)
+                .role(Role.ASSISTANT)
+                .content(chatResponse.answer())
+                .user(user)
+                .build();
+
+        chatMessageRepository.save(botMsg);
+
+        return chatResponse;
     }
 }
