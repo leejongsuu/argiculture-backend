@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Response<Void>> handleException(Exception e) {
 
-        log.error("서버 예외 발생", e);
+        log.error("서버 예외 발생 : {}", e.toString());
         return responseFactory.error(new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage()));
     }
 
