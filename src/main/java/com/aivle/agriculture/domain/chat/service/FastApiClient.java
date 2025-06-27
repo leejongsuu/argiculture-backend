@@ -1,13 +1,10 @@
-package com.aivle.agriculture.domain.common.client;
+package com.aivle.agriculture.domain.chat.service;
 
 import com.aivle.agriculture.domain.chat.dto.ChatResponse;
-import org.springframework.beans.factory.annotation.Value;
+import com.aivle.agriculture.domain.chat.dto.RagPayload;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 @Component
 public class FastApiClient {
@@ -17,13 +14,14 @@ public class FastApiClient {
         this.webClient = webClient;
     }
 
-    public Mono<ChatResponse> askRag(String question) {
+    public ChatResponse askRag(RagPayload ragPayload) {
         return webClient.post()
                 .uri("/chat")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("question", question))
+                .bodyValue(ragPayload)
                 .retrieve()
-                .bodyToMono(ChatResponse.class);
+                .bodyToMono(ChatResponse.class)
+                .block();
     }
 }
 
