@@ -1,6 +1,6 @@
 package com.aivle.agriculture.domain.chat.entity;
 
-import com.aivle.agriculture.domain.Login.entity.User;
+import com.aivle.agriculture.domain.auth.entity.User;
 import com.aivle.agriculture.global.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
