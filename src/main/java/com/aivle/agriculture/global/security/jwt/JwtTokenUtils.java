@@ -31,12 +31,12 @@ public class JwtTokenUtils {
     }
 
     // 토큰 생성
-    public String generateAccessToken(String providerId) {
+    public String generateAccessToken(Long userId) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + expirationTimeMillis);
 
         return Jwts.builder()
-                .setSubject(providerId)
+                .setSubject(String.valueOf(userId))
                 .claim("auth", "ROLE_USER")
                 .setIssuedAt(now)
                 .setExpiration(expiration)

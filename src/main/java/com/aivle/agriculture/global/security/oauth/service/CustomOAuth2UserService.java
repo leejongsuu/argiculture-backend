@@ -23,36 +23,42 @@ import static com.aivle.agriculture.global.response.ErrorCode.BAD_REQUEST;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+    private final DefaultOAuth2UserService delegate;
     private final UserRepository userRepository;
 
     @Override
     @Transactional
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) {
-        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-        OAuth2User oAuth2User = delegate.loadUser(userRequest);
+    public OAuth2User loadUser(OAuth2UserRequest request) {
+        OAuth2User oAuth2User = delegate.loadUser(request);
+        String provider = request.getClientRegistration().getRegistrationId();
+        Oauth2UserInfo info = extractUserInfo(provider, oAuth2User.getAttributes());
+        User user = findOrCreateUser(info);
+        return new UserPrincipal(user, oAuth2User.getAttributes(), info.getProviderId());
+    }
 
-        String provider = userRequest.getClientRegistration().getRegistrationId();
-        Map<String, Object> attributes = oAuth2User.getAttributes();
-
-        Oauth2UserInfo userInfo = switch (provider) {
-            case "kakao" -> new KakaoUserInfo(attributes);
-            case "naver" -> new NaverUserInfo(attributes);
-            case "google" -> new GoogleUserInfo(attributes);
-            default -> throw new CustomException(BAD_REQUEST, "지원하지 않는 OAuth2 제공자입니다: " + provider);
+    private Oauth2UserInfo extractUserInfo(String provider, Map<String, Object> attrs) {
+        return switch (provider) {
+            case "kakao" -> new KakaoUserInfo(attrs);
+            case "naver" -> new NaverUserInfo(attrs);
+            case "google" -> new GoogleUserInfo(attrs);
+            default -> throw new CustomException(BAD_REQUEST, "지원하지 않는 OAuth2 제공자: " + provider);
         };
+    }
 
-        User user = userRepository.findByProviderAndProviderId(
-                userInfo.getProvider(), userInfo.getProviderId()
-        ).orElseGet(() -> {
-            User u = User.builder()
-                    .name(userInfo.getName())
-                    .provider(userInfo.getProvider())
-                    .providerId(userInfo.getProviderId())
-                    .build();
-            return userRepository.save(u);
-        });
+    @Transactional
+    public User findOrCreateUser(Oauth2UserInfo info) {
+        return userRepository.findByProviderAndProviderId(
+                        info.getProvider(), info.getProviderId())
+                .orElseGet(() -> createUser(info));
+    }
 
-        return new UserPrincipal(user, attributes, userInfo.getProviderId());
+    private User createUser(Oauth2UserInfo info) {
+        User user = User.builder()
+                .name(info.getName())
+                .provider(info.getProvider())
+                .providerId(info.getProviderId())
+                .build();
+        return userRepository.save(user);
     }
 }
 

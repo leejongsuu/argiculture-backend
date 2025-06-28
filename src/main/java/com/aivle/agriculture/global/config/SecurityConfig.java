@@ -39,11 +39,13 @@ public class SecurityConfig {
     private String tempUrl;
     @Value("${url.temp2}")
     private String temp2Url;
+    @Value("${url.temp3}")
+    private String temp3Url;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(frontendUrl, tempUrl, temp2Url)); // 정확히 Origin 일치
+        config.setAllowedOrigins(List.of(frontendUrl, tempUrl, temp2Url, temp3Url));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

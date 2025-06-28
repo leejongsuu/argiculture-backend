@@ -36,7 +36,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         Response<Void> errorBody = responseFactory
-                .error(new CustomException(ErrorCode.UNAUTHORIZED, "인증이 필요합니다."))
+                .error(new CustomException(ErrorCode.UNAUTHORIZED))
                 .getBody();
 
         objectMapper.writeValue(response.getWriter(), errorBody);
