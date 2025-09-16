@@ -37,4 +37,8 @@ public class ChatMessage extends BaseEntity {
         this.content = content;
         this.user = user;
     }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
+    }
 }

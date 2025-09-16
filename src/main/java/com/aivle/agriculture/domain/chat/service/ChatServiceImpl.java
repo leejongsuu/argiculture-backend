@@ -1,6 +1,7 @@
 package com.aivle.agriculture.domain.chat.service;
 
 import com.aivle.agriculture.domain.chat.dto.ChatResponse;
+import com.aivle.agriculture.domain.chat.dto.ConversationContext;
 import com.aivle.agriculture.domain.chat.dto.RagPayload;
 import com.aivle.agriculture.domain.chat.entity.ChatMessage;
 import com.aivle.agriculture.domain.chat.entity.Role;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,5 +69,47 @@ public class ChatServiceImpl implements ChatService {
         chatMessageRepository.save(botMsg);
 
         return chatResponse;
+    }
+
+    @Override
+    public ChatMessage saveMessage(ChatMessage message) {
+        return chatMessageRepository.save(message);
+    }
+
+    @Override
+    public CompletableFuture<String> processMessageAsync(String question, ConversationContext context) {
+        return CompletableFuture.supplyAsync(() -> {
+            String contextString = buildContextString(context);
+
+            RagPayload payload = RagPayload.builder()
+                .conversationId(context.getConversationId())
+                .context(contextString)
+                .question(question)
+                .build();
+
+            ChatResponse response = fastApiClient.askRag(payload);
+            return response.answer();
+        });
+    }
+
+    private String buildContextString(ConversationContext context) {
+        StringBuilder contextBuilder = new StringBuilder();
+
+        if (context.getSummary() != null && !context.getSummary().isEmpty()) {
+            contextBuilder.append("이전 대화 요약: ").append(context.getSummary()).append("\n\n");
+        }
+
+        if (context.getRecentMessages() != null && !context.getRecentMessages().isEmpty()) {
+            List<ChatMessage> messages = context.getRecentMessages();
+            Collections.reverse(messages);
+
+            String recentContext = messages.stream()
+                .map(msg -> msg.getRole() + ": " + msg.getContent())
+                .collect(Collectors.joining("\n"));
+
+            contextBuilder.append("최근 대화:\n").append(recentContext);
+        }
+
+        return contextBuilder.toString();
     }
 }

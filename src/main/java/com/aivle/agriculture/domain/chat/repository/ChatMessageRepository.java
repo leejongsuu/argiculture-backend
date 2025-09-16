@@ -11,4 +11,13 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     @Query("SELECT m FROM ChatMessage m WHERE m.conversationId = :convId ORDER BY m.createdAt DESC")
     List<ChatMessage> findRecentMessages(String convId, Pageable pageable);
+
+    @Query("SELECT m FROM ChatMessage m WHERE m.conversationId = :conversationId ORDER BY m.createdAt DESC")
+    List<ChatMessage> findByConversationIdOrderByTimestampDesc(String conversationId, Pageable pageable);
+
+    @Query("SELECT COUNT(m) FROM ChatMessage m WHERE m.conversationId = :conversationId")
+    int countByConversationId(String conversationId);
+
+    @Query("SELECT m FROM ChatMessage m WHERE m.conversationId = :conversationId ORDER BY m.createdAt ASC LIMIT :offset, :limit")
+    List<ChatMessage> findOlderMessages(String conversationId, int offset, Pageable pageable);
 }
